@@ -1,0 +1,38 @@
+# Treeni AI — Lean Backend Dependencies
+
+# ── Web Framework ──────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart==0.0.9
+
+# ── Database ───────────────────────────────────────
+sqlalchemy[asyncio]==2.0.31
+asyncpg==0.29.0
+alembic==1.13.2
+pgvector==0.3.2
+
+# ── Cache / Queue ──────────────────────────────────
+redis[hiredis]==5.0.7
+arq==0.26.1
+
+# ── LLM ────────────────────────────────────────────
+google-genai==0.3.0
+
+# ── HTTP ───────────────────────────────────────────
+httpx==0.27.0
+tenacity==8.5.0
+
+# ── Config & Security ──────────────────────────────
+pydantic==2.8.2
+pydantic-settings==2.3.4
+python-dotenv==1.0.1
+cryptography==42.0.8
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# ── Email ──────────────────────────────────────────
+sendgrid==6.11.0
+
+# ── Utilities ──────────────────────────────────────
+structlog==24.4.0
+python-dateutil==2.9.0

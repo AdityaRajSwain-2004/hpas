@@ -1,0 +1,45 @@
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Node ──────────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+frontend/build/
+*.tsbuildinfo
+
+# ── Environment (NEVER commit) ────────────────────────────────
+.env
+backend/.env
+frontend/.env
+*.env.local
+
+# ── Docker volumes (data) ─────────────────────────────────────
+postgres-data/
+redis-data/
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── IDE ───────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── FAISS fallback index ──────────────────────────────────────
+faiss_index/
+*.faiss

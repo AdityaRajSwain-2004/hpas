@@ -1,0 +1,90 @@
+version: "3.9"
+
+# ════════════════════════════════════════════════════
+# Treeni AI — Lean Stack
+# 4 services: PostgreSQL + Redis + API + Worker
+# ════════════════════════════════════════════════════
+
+services:
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: treeni-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       treeni_ai
+      POSTGRES_USER:     treeni
+      POSTGRES_PASSWORD: treeni_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U treeni -d treeni_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: treeni-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: treeni-api
+    restart: unless-stopped
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://treeni:treeni_secret@postgres:5432/treeni_ai
+      REDIS_URL:    redis://redis:6379/0
+      ENVIRONMENT:  development
+    env_file:
+      - ./backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: treeni-worker
+    restart: unless-stopped
+    working_dir: /workspace
+    volumes:
+      - ./backend:/workspace
+    environment:
+      DATABASE_URL: postgresql+asyncpg://treeni:treeni_secret@postgres:5432/treeni_ai
+      REDIS_URL:    redis://redis:6379/0
+      ENVIRONMENT:  development
+    env_file:
+      - ./backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: python -m arq app.workers.worker.WorkerSettings
+
+volumes:
+  postgres-data:
+  redis-data:
